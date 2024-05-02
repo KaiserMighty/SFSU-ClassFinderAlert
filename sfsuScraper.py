@@ -42,7 +42,8 @@ def scrape_table_data(url):
         
         # Iterate through each <tr> tag
         for tr in tr_tags:
-            # Check if the content of the 4th <tr> tag matches any element in the classno array
+            if tr.find_all('td')[9].string.strip() == "0" and tr.find_all('td')[8].find_all()[1].string.strip() == "0":
+                continue
             if not classid or tr.find_all('td')[3].string.strip() in classid:
                 print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), end=' ')
                 th_tag = tbody.find('th')
@@ -79,7 +80,8 @@ while True:
         subject, category_number = class_name.split(' ')
         
         # Example usage
-        url_template = 'https://webapps.sfsu.edu/public/classservices/classsearch/results?term={}&classCategory=REG&subject={}&categoryNumber={}&remainingSeats=y'
+        url_template = 'https://webapps.sfsu.edu/public/classservices/classsearch/results?term={}&classCategory=REG&subject={}&categoryNumber={}'
         url = url_template.format(term, subject, category_number)
+        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         scrape_table_data(url)
     time.sleep(60)  # Sleep for 60 seconds before scraping again

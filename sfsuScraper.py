@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import os
 import time
+import pygetwindow as gw
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -24,7 +25,7 @@ def scrape_table_data(url):
     service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get(url)
-    
+
     try:
         # Wait until the element with class "dataTables_empty" is not found
         WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME, 'dataTables_empty')))
@@ -45,6 +46,18 @@ def scrape_table_data(url):
             if tr.find_all('td')[9].string.strip() == "0" and tr.find_all('td')[8].find_all()[1].string.strip() == "0":
                 continue
             if not classid or tr.find_all('td')[3].string.strip() in classid:
+                # Focus window to get my attention
+                windows = gw.getAllWindows()
+                cmd_window = None
+                for window in windows:
+                    if "sfsuScraper.py" in window.title and ("cmd.exe" in window.title or "Command Prompt" in window.title):
+                        cmd_window = window
+                        break
+                try:
+                    cmd_window.activate()
+                except gw.PyGetWindowException:
+                    pass
+                # Print to output
                 print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), end=' ')
                 th_tag = tbody.find('th')
                 if th_tag:
